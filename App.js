@@ -2,7 +2,8 @@ import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { View, Text } from "react-native";
-import Icon from "react-native-vector-icons/Ionicons"; // Sử dụng icon từ react-native-vector-icons
+import Icon from "react-native-vector-icons/Ionicons";
+import Animated, { Easing, withTiming, useAnimatedStyle } from "react-native-reanimated";
 import { colors } from "./app/theme/Colors";
 import HomeScreen from "./app/screens/Home/HomeScreen";
 
@@ -24,7 +25,6 @@ const CalendarScreen = () => (
   </View>
 );
 
-// Tạo Bottom Tab Navigator
 const Tab = createBottomTabNavigator();
 
 const App = () => {
@@ -33,6 +33,11 @@ const App = () => {
       <Tab.Navigator
         screenOptions={({ route }) => ({
           headerShown: false,
+          tabBarStyle: {
+            backgroundColor: colors.white[50],
+            borderTopLeftRadius: 16,
+            borderTopRightRadius: 16,
+          },
           tabBarIcon: ({ focused, color, size }) => {
             let iconName;
 
@@ -46,12 +51,25 @@ const App = () => {
               iconName = focused ? "calendar" : "calendar-outline";
             }
 
-            return <Icon name={iconName} size={size} color={color} />;
+            const animatedStyle = useAnimatedStyle(() => {
+              return {
+                opacity: withTiming(focused ? 1 : 0.5, {
+                  duration: 300,
+                  easing: Easing.ease,
+                }),
+              };
+            });
+
+            return (
+              <Animated.View style={animatedStyle}>
+                <Icon name={iconName} size={size} color={color} />
+              </Animated.View>
+            );
           },
           tabBarActiveTintColor: colors.lightpink,
           tabBarInactiveTintColor: colors.gray[300],
           tabBarActiveBackgroundColor: colors.white[50],
-          tabBarInactiveBackgroundColor:colors.white[50],
+          tabBarInactiveBackgroundColor: colors.white[50],
         })}
       >
         <Tab.Screen name="Home" component={HomeScreen} />
