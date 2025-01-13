@@ -3,7 +3,11 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { View, Text } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
-import Animated, { Easing, withTiming, useAnimatedStyle } from "react-native-reanimated";
+import Animated, {
+  Easing,
+  withTiming,
+  useAnimatedStyle,
+} from "react-native-reanimated";
 import { colors } from "./app/theme/Colors";
 import HomeScreen from "./app/screens/Home/HomeScreen";
 
