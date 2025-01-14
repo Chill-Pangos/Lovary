@@ -10,6 +10,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { colors } from "./app/theme/Colors";
 import HomeScreen from "./app/screens/Home/HomeScreen";
+import CalendarScreen from "./app/screens/Calendar/CalendarScreen";
 
 const PolaroidScreen = () => (
   <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -20,12 +21,6 @@ const PolaroidScreen = () => (
 const DairyScreen = () => (
   <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
     <Text>Dairy Screen</Text>
-  </View>
-);
-
-const CalendarScreen = () => (
-  <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-    <Text>Calendar Screen</Text>
   </View>
 );
 
