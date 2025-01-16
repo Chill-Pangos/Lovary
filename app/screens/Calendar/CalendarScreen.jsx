@@ -55,7 +55,7 @@ const CalendarScreen = () => {
   const [selectedDate, setSelectedDate] = useState(today);
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
         <View style={styles.screenHeaderContainer}>
           <Text style={styles.screenHeaderText}>Lịch</Text>

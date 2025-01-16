@@ -9,7 +9,7 @@ const LoveDays = () => {
 
   const formatDate = (date) => {
     const options = { year: "numeric", month: "long", day: "numeric" };
-    return date.toLocaleDateString("vi-VN", options); // Định dạng ngày theo chuẩn Việt Nam
+    return date.toLocaleDateString("vi-VN", options);
   };
 
   useEffect(() => {
