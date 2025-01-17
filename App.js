@@ -7,16 +7,11 @@ import { colors } from "./app/theme/Colors";
 import HomeScreen from "./app/screens/Home/HomeScreen";
 import CalendarScreen from "./app/screens/Calendar/CalendarScreen";
 import { SafeAreaView } from "react-native-safe-area-context";
+import DiaryScreen from "./app/screens/Diary/DiaryScreen";
 
 const PolaroidScreen = () => (
   <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
     <Text>Polaroid Screen</Text>
-  </View>
-);
-
-const DairyScreen = () => (
-  <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-    <Text>Dairy Screen</Text>
   </View>
 );
 
@@ -36,7 +31,7 @@ const App = () => {
 
               if (route.name === "Trang chủ") {
                 iconName = focused ? "home" : "home-outline";
-              } else if (route.name === "Polaroid") {
+              } else if (route.name === "Thư viện") {
                 iconName = focused ? "camera" : "camera-outline";
               } else if (route.name === "Nhật ký") {
                 iconName = focused ? "book" : "book-outline";
@@ -53,8 +48,8 @@ const App = () => {
           })}
         >
           <Tab.Screen name="Trang chủ" component={HomeScreen} />
-          <Tab.Screen name="Polaroid" component={PolaroidScreen} />
-          <Tab.Screen name="Nhật ký" component={DairyScreen} />
+          <Tab.Screen name="Thư viện" component={PolaroidScreen} />
+          <Tab.Screen name="Nhật ký" component={DiaryScreen} />
           <Tab.Screen name="Lịch" component={CalendarScreen} />
         </Tab.Navigator>
       </NavigationContainer>
