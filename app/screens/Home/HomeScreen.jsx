@@ -31,8 +31,8 @@ const HomeScreen = () => {
   const [daysUsed, setDaysUsed] = useState(0);
   const [days, setDays] = useState(null);
   const [backgroundImage, setBackgroundImage] = useState(null);
-  const [user1, setUser1] = useState({ name: "mintun", avatar: null });
-  const [user2, setUser2] = useState({ name: "DTT", avatar: null });
+  const [user1, setUser1] = useState({ name: "User1", avatar: null });
+  const [user2, setUser2] = useState({ name: "User2", avatar: null });
   const [editingUser, setEditingUser] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [newName, setNewName] = useState("");
@@ -133,7 +133,7 @@ const HomeScreen = () => {
         source={
           backgroundImage
             ? { uri: backgroundImage }
-            : require("../../assets/exampleBG/backgroundLovary.png")
+            : require("../../assets/exampleBG/sampleBackground-alexander-grey-unsplash.jpg")
         }
       >
         <View style={styles.screenHeaderContainer}>
@@ -207,7 +207,7 @@ const HomeScreen = () => {
                 source={
                   user1.avatar
                     ? { uri: user1.avatar }
-                    : require("../../assets/exampleBG/th.jpg")
+                    : require("../../assets/exampleBG/user-avatar-Senapedia.png")
                 }
               ></Image>
               <Text style={styles.userName}>{user1.name}</Text>
@@ -262,7 +262,7 @@ const HomeScreen = () => {
                 source={
                   user2.avatar
                     ? { uri: user2.avatar }
-                    : require("../../assets/exampleBG/background.jpg")
+                    : require("../../assets/exampleBG/user-avatar-Senapedia.png")
                 }
               ></Image>
               <Text style={styles.userName}>{user2.name}</Text>
