@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 10,
     justifyContent: "center",
-    flexGrow:1,
+    flexGrow: 1,
   },
   selectedEvent: {
     borderColor: "#FF69B4",
