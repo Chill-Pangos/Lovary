@@ -8,21 +8,53 @@ import {
   Dimensions,
   Image,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import Svg, { G, LinearGradient, Stop, Path, Defs } from "react-native-svg";
 import { useFonts } from "expo-font";
-
+import DayService from "../../services/DayServices";
 const { width, height } = Dimensions.get("window");
 
 const HomeScreen = () => {
+  const navigation = useNavigation();
   const [fontsLoaded] = useFonts({
     Outfit: require("../../assets/fonts/Outfit-VariableFont_wght.ttf"),
     Courgette: require("../../assets/fonts/Courgette-Regular.ttf"),
   });
 
+  
+
+  const [daysUsed, setDaysUsed] = useState(0);
+  const [days, setDays] = useState(null);
+
+  const formatDate = (date) => {
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return date.toLocaleDateString("vi-VN", options);
+  };
+
+  useEffect(() => {
+    const initializeDate = async () => {
+      try {
+        const firstDate = await DayService.getFirstDate();
+        if (!firstDate) {
+          await DayService.storeFirstDate();
+          setDaysUsed(0);
+        } else {
+          const days = await DayService.getDaysInLove();
+          setDaysUsed(days);
+        }
+        setDays(firstDate);
+      } catch (error) {
+        console.error("Error initializing date:", error);
+      }
+    };
+  
+    initializeDate();
+  }, []);
+  
   if (!fontsLoaded) {
-    return null;
+    return <View style={{ flex: 1, backgroundColor: "#fff" }} />;
   }
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -34,13 +66,13 @@ const HomeScreen = () => {
           <Text style={styles.screenHeaderText}>Lovary</Text>
           <View style={{ flex: 1 }}></View>
           <TouchableOpacity>
-            <Ionicons name={"camera"} size={27} color="white"></Ionicons>
+            <Ionicons name={"camera"} size={27} color="white" onPress={() => navigation.navigate("Thư viện")}></Ionicons>
           </TouchableOpacity>
           <TouchableOpacity>
-            <Ionicons name={"book"} size={27} color="white"></Ionicons>
+            <Ionicons name={"book"} size={27} color="white" onPress={() => navigation.navigate("Nhật ký")}></Ionicons>
           </TouchableOpacity>
           <TouchableOpacity>
-            <Ionicons name={"calendar"} size={27} color="white"></Ionicons>
+            <Ionicons name={"calendar"} size={27} color="white" onPress={() => navigation.navigate("Lịch")}></Ionicons>
           </TouchableOpacity>
         </View>
 
@@ -60,7 +92,7 @@ const HomeScreen = () => {
             />
           </Svg>
           <View style={styles.heartCountTextContainer}>
-            <Text style={styles.heartCountDay}>262</Text>
+            <Text style={styles.heartCountDay}>{daysUsed}</Text>
             <Text style={styles.heartCountText}>Ngày</Text>
           </View>
         </View>

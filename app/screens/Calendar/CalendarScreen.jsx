@@ -16,7 +16,10 @@ import {
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-
+import AddDetailModal from "./AddDetailsModal";
+import ViewDetailsModal from "./ViewDetailsModal";
+import SelectTypeModal from "./SelectTypeModal";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 const { width, height } = Dimensions.get("window");
 
 const renderCustomHeader = (date) => {
@@ -41,7 +44,7 @@ const formatDate = (dateString) => {
 };
 
 const CalendarScreen = () => {
-  let now = new Date();
+  /*  let now = new Date();
   useEffect(() => {
     now = new Date(Date.now());
   }, []);
@@ -52,7 +55,65 @@ const CalendarScreen = () => {
     "-" +
     now.getDate().toString().padStart(2, "0");
 
-  const [selectedDate, setSelectedDate] = useState(today);
+  const [selectedDate, setSelectedDate] = useState(today); */
+  const [selectedDate, setSelectedDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
+  const [data, setData] = useState({});
+  const [modalType, setModalType] = useState(null);
+  const [currentModal, setCurrentModal] = useState(null); // 'add' | 'view' | 'selectType'
+  const [inputValue, setInputValue] = useState(""); // dùng cho note
+  const [imageUri, setImageUri] = useState(null); // dùng cho uri
+  const [eventChoosen, setEventChoosen] = useState(null); // dùng cho event
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const storedData = await AsyncStorage.getItem("calendarData");
+      if (storedData) setData(JSON.parse(storedData));
+    };
+    fetchData();
+  }, []);
+
+  const saveData = async (newData) => {
+    setData(newData);
+    await AsyncStorage.setItem("calendarData", JSON.stringify(newData));
+  };
+
+  const addItem = async () => {
+    const newData = { ...data };
+    if (!newData[selectedDate]) {
+      newData[selectedDate] = { events: [], photos: [], notes: [] };
+    }
+
+    if (!newData[selectedDate][modalType]) {
+      newData[selectedDate][modalType] = [];
+    }
+    if (imageUri) {
+      newData[selectedDate].photos.push(imageUri);
+    } else if (inputValue) {
+      newData[selectedDate].notes.push(inputValue);
+    } else {
+      newData[selectedDate].events.push(eventChoosen);
+    }
+   /*  alert("imageUri before saving:", imageUri);
+    alert("newData before saving:", newData); */
+    await saveData(newData);
+    setInputValue("");
+    setImageUri(null);
+    setEventChoosen("");
+    setCurrentModal(null);
+  };
+
+  const deleteItem = async (index) => {
+    const newData = { ...data };
+    newData[selectedDate][modalType].splice(index, 1);
+    await saveData(newData);
+  };
+
+  const openAddDetailModal = (type) => {
+    setModalType(type);
+    setCurrentModal("add");
+  };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -60,7 +121,10 @@ const CalendarScreen = () => {
         <View style={styles.screenHeaderContainer}>
           <Text style={styles.screenHeaderText}>Lịch</Text>
           <View style={{ flex: 1 }}></View>
-          <TouchableOpacity style={{ marginRight: 15 }}>
+          <TouchableOpacity
+            style={{ marginRight: 15 }}
+            onPress={() => setCurrentModal("selectType")}
+          >
             <Entypo name="plus" size={30} color="#FF45BB" />
           </TouchableOpacity>
           <TouchableOpacity>
@@ -99,7 +163,11 @@ const CalendarScreen = () => {
             ></FontAwesome>
           )}
         ></Calendar>
-        <TouchableOpacity style={styles.quoteContainer} activeOpacity={1}>
+        <TouchableOpacity
+          style={styles.quoteContainer}
+          activeOpacity={1}
+          onPress={() => setCurrentModal("selectType")}
+        >
           <View style={{ flexDirection: "column", flex: 1, gap: 10 }}>
             <Text style={styles.quoteTextHeader}>
               Hãy cùng nhau tạo nên ngày đặc biệt
@@ -110,7 +178,14 @@ const CalendarScreen = () => {
         </TouchableOpacity>
 
         <View style={styles.widgetContainer}>
-          <TouchableOpacity activeOpacity={0.7} style={styles.eventWidget}>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            style={styles.eventWidget}
+            onPress={() => {
+              setModalType("events");
+              setCurrentModal("view");
+            }}
+          >
             <View
               style={{
                 borderRadius: 50,
@@ -121,11 +196,18 @@ const CalendarScreen = () => {
               <MaterialIcons name="event" size={40} color="#FD499D" />
             </View>
             <Text style={{ fontSize: 22, color: "#FD499D", fontWeight: "600" }}>
-              0
+              {data[selectedDate]?.events?.length || 0}
             </Text>
             <Text style={{ fontSize: 18, color: "#6E6E6E" }}>Sự kiện</Text>
           </TouchableOpacity>
-          <TouchableOpacity activeOpacity={0.7} style={styles.imageWidget}>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            style={styles.imageWidget}
+            onPress={() => {
+              setModalType("photos");
+              setCurrentModal("view");
+            }}
+          >
             <View
               style={{
                 borderRadius: 50,
@@ -136,11 +218,18 @@ const CalendarScreen = () => {
               <FontAwesome6 name="images" size={40} color="#5D42FA" />
             </View>
             <Text style={{ fontSize: 22, color: "#5D42FA", fontWeight: "600" }}>
-              0
+              {data[selectedDate]?.photos?.length || 0}
             </Text>
             <Text style={{ fontSize: 18, color: "#6E6E6E" }}>Ảnh</Text>
           </TouchableOpacity>
-          <TouchableOpacity activeOpacity={0.7} style={styles.noteWidget}>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            style={styles.noteWidget}
+            onPress={() => {
+              setModalType("notes");
+              setCurrentModal("view");
+            }}
+          >
             <View
               style={{
                 borderRadius: 50,
@@ -155,11 +244,39 @@ const CalendarScreen = () => {
               />
             </View>
             <Text style={{ fontSize: 22, color: "#0AB73E", fontWeight: "600" }}>
-              0
+              {data[selectedDate]?.notes?.length || 0}
             </Text>
             <Text style={{ fontSize: 18, color: "#6E6E6E" }}>Ghi chú</Text>
           </TouchableOpacity>
         </View>
+        <SelectTypeModal
+          visible={currentModal === "selectType"}
+          onSelectType={(type) => {
+            setCurrentModal(null);
+            openAddDetailModal(type);
+          }}
+          onClose={() => setCurrentModal(null)}
+        />
+        <AddDetailModal
+          visible={currentModal === "add"}
+          modalType={modalType}
+          inputValue={inputValue}
+          onChangeText={setInputValue}
+          imageUri={imageUri}
+          setImage={setImageUri}
+          event={eventChoosen}
+          setEvent={setEventChoosen}
+          onSave={addItem}
+          onClose={() => setCurrentModal(null)}
+        />
+
+        <ViewDetailsModal
+          visible={currentModal === "view"}
+          modalType={modalType}
+          items={data[selectedDate]?.[modalType] || []}
+          onDelete={deleteItem}
+          onClose={() => setCurrentModal(null)}
+        />
       </View>
     </SafeAreaView>
   );
