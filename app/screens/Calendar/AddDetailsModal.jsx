@@ -7,9 +7,13 @@ import {
   Modal,
   StyleSheet,
   Image,
+  FlatList,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import { MaterialIcons } from "@expo/vector-icons";
 import { useEffect } from "react";
+
+import eventOptions from "./eventOptions";
 
 const AddDetailModal = ({
   visible,
@@ -18,10 +22,13 @@ const AddDetailModal = ({
   onChangeText,
   imageUri,
   setImage,
+  event,
+  setEvent,
   onSave,
   onClose,
 }) => {
   const [selectedImage, setSelectedImage] = useState();
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
   const pickImage = async () => {
     try {
@@ -60,6 +67,7 @@ const AddDetailModal = ({
     } */
     onSave();
     setSelectedImage(null);
+    setSelectedEvent(null);
   };
 
   return (
@@ -89,12 +97,52 @@ const AddDetailModal = ({
                 />
               )}
             </>
+          ) : modalType === "events" ? (
+            <FlatList
+              data={eventOptions}
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={({ item }) => (
+                <View
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    flexDirection: "row",
+                  }}
+                >
+                  <TouchableOpacity
+                    style={[
+                      styles.eventButton,
+                      selectedEvent?.id === item.id && styles.selectedEvent,
+                    ]}
+                    onPress={() => {
+                      setSelectedEvent(item);
+                      setEvent(item);
+                    }}
+                  >
+                    <MaterialIcons
+                      name={item.icon}
+                      size={24}
+                      color={
+                        selectedEvent?.id === item.id ? "#FF69C9" : "black"
+                      }
+                    />
+                    <Text
+                      style={[
+                        styles.eventText,
+                        selectedEvent?.id === item.id && { color: "#FF69C9" },
+                      ]}
+                    >
+                      {item.name}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            />
           ) : (
             <TextInput
               style={styles.input}
-              placeholder={`Nhập ${
-                modalType === "events" ? "sự kiện" : "ghi chú"
-              }`}
+              placeholder={`Nhập ghi chú
+              `}
               value={inputValue}
               onChangeText={onChangeText}
             />
@@ -165,5 +213,35 @@ const styles = StyleSheet.create({
     height: 200,
     borderRadius: 10,
     marginVertical: 10,
+  },
+  eventList: {
+    marginTop: 20,
+  },
+  eventItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  eventName: {
+    marginLeft: 10,
+    fontSize: 16,
+  },
+  eventButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    marginBottom: 10,
+    justifyContent: "center",
+    flexGrow:1,
+  },
+  selectedEvent: {
+    borderColor: "#FF69B4",
+  },
+  eventText: {
+    marginLeft: 10,
+    fontSize: 16,
   },
 });

@@ -10,6 +10,8 @@ import {
   Image,
   Alert,
 } from "react-native";
+import eventOptions from "./eventOptions";
+import { MaterialIcons } from "@expo/vector-icons";
 
 const ViewDetailsModal = ({ visible, modalType, items, onDelete, onClose }) => {
   const renderItems = (item, index) => (
@@ -20,7 +22,7 @@ const ViewDetailsModal = ({ visible, modalType, items, onDelete, onClose }) => {
       </TouchableOpacity>
     </View>
   );
- /*   useEffect(() => {
+  /*   useEffect(() => {
         alert(`Items: ${JSON.stringify(items)}`);
       }, [items]); */
 
@@ -37,7 +39,15 @@ const ViewDetailsModal = ({ visible, modalType, items, onDelete, onClose }) => {
           </Text>
           {modalType === "photos"
             ? items.map((photoUri, index) => (
-                <View key={index} style={{ marginBottom: 10 }}>
+                <View
+                  key={index}
+                  style={{
+                    marginBottom: 10,
+                    flexDirection: "row",
+                    justifyContent: "space-evenly",
+                    alignItems: "center",
+                  }}
+                >
                   {photoUri && (
                     <Image
                       source={{ uri: photoUri }}
@@ -45,15 +55,76 @@ const ViewDetailsModal = ({ visible, modalType, items, onDelete, onClose }) => {
                     />
                   )}
                   <TouchableOpacity onPress={() => onDelete(index)}>
-                    <Text style={{ color: "red" }}>Xóa</Text>
+                    <Text
+                      style={{
+                        color: "red",
+                        borderColor: "red",
+                        paddingHorizontal: 8,
+                        paddingVertical: 4,
+                        borderWidth: 1,
+                        borderRadius: 8,
+                      }}
+                    >
+                      X
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              ))
+            : modalType === "notes"
+            ? items.map((item, index) => (
+                <View
+                  key={index}
+                  style={{
+                    marginBottom: 10,
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <Text>{item}</Text>
+                  <TouchableOpacity onPress={() => onDelete(index)}>
+                    <Text
+                      style={{
+                        color: "red",
+                        borderColor: "red",
+                        paddingHorizontal: 8,
+                        paddingVertical: 4,
+                        borderWidth: 1,
+                        borderRadius: 8,
+                      }}
+                    >
+                      X
+                    </Text>
                   </TouchableOpacity>
                 </View>
               ))
             : items.map((item, index) => (
-                <View key={index} style={{ marginBottom: 10 }}>
-                  <Text>{item}</Text>
+                <View
+                  key={index}
+                  style={{
+                    marginBottom: 10,
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <View  style={styles.eventItem}>
+            <MaterialIcons name={item?.icon} size={24} color="black" />
+            <Text style={styles.eventName}>{item?.name}</Text>
+          </View>
                   <TouchableOpacity onPress={() => onDelete(index)}>
-                    <Text style={{ color: "red" }}>Xóa</Text>
+                    <Text
+                      style={{
+                        color: "red",
+                        borderColor: "red",
+                        paddingHorizontal: 8,
+                        paddingVertical: 4,
+                        borderWidth: 1,
+                        borderRadius: 8,
+                      }}
+                    >
+                      X
+                    </Text>
                   </TouchableOpacity>
                 </View>
               ))}
@@ -97,5 +168,14 @@ const styles = StyleSheet.create({
   closeButton: {
     marginTop: 10,
     alignItems: "center",
+  },
+  eventItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  eventName: {
+    marginLeft: 10,
+    fontSize: 16,
   },
 });

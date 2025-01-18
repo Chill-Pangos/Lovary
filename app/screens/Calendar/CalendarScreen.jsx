@@ -64,6 +64,7 @@ const CalendarScreen = () => {
   const [currentModal, setCurrentModal] = useState(null); // 'add' | 'view' | 'selectType'
   const [inputValue, setInputValue] = useState(""); // dùng cho note
   const [imageUri, setImageUri] = useState(null); // dùng cho uri
+  const [eventChoosen, setEventChoosen] = useState(null); // dùng cho event
 
   useEffect(() => {
     const fetchData = async () => {
@@ -89,14 +90,17 @@ const CalendarScreen = () => {
     }
     if (imageUri) {
       newData[selectedDate].photos.push(imageUri);
+    } else if (inputValue) {
+      newData[selectedDate].notes.push(inputValue);
     } else {
-      newData[selectedDate][modalType].push(inputValue);
+      newData[selectedDate].events.push(eventChoosen);
     }
    /*  alert("imageUri before saving:", imageUri);
     alert("newData before saving:", newData); */
     await saveData(newData);
     setInputValue("");
     setImageUri(null);
+    setEventChoosen("");
     setCurrentModal(null);
   };
 
@@ -260,6 +264,8 @@ const CalendarScreen = () => {
           onChangeText={setInputValue}
           imageUri={imageUri}
           setImage={setImageUri}
+          event={eventChoosen}
+          setEvent={setEventChoosen}
           onSave={addItem}
           onClose={() => setCurrentModal(null)}
         />
