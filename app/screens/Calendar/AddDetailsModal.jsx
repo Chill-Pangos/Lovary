@@ -71,7 +71,7 @@ const AddDetailModal = ({
   };
 
   return (
-    <Modal transparent={true} animationType="slide" visible={visible}>
+    <Modal transparent={true} animationType="fade" visible={visible}>
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
           <Text style={styles.modalHeader}>
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 10,
     justifyContent: "center",
-    flexGrow:1,
+    flexGrow: 1,
   },
   selectedEvent: {
     borderColor: "#FF69B4",

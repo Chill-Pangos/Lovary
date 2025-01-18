@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, Modal, StyleSheet } from "react-native";
 
 const SelectTypeModal = ({ visible, onSelectType, onClose }) => {
   return (
-    <Modal transparent={true} animationType="slide" visible={visible}>
+    <Modal transparent={true} animationType="fade" visible={visible}>
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
           <Text style={styles.modalHeader}>Chọn loại để thêm</Text>

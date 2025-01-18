@@ -41,7 +41,7 @@ const AddDiaryModal = ({ visible, setModalVisible, refreshDiaryList }) => {
     setModalVisible(false); 
   };
   return (
-    <Modal transparent={true} animationType="slide" visible={visible}>
+    <Modal transparent={true} animationType="fade" visible={visible}>
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
           <Text style={styles.headerText}>Thêm nhật ký</Text>

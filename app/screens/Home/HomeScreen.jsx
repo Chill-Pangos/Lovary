@@ -7,12 +7,17 @@ import {
   TouchableOpacity,
   Dimensions,
   Image,
+  Modal,
+  TextInput,
+  Button,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import Svg, { G, LinearGradient, Stop, Path, Defs } from "react-native-svg";
 import { useFonts } from "expo-font";
+import * as ImagePicker from "expo-image-picker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import DayService from "../../services/DayServices";
 const { width, height } = Dimensions.get("window");
 
@@ -23,10 +28,15 @@ const HomeScreen = () => {
     Courgette: require("../../assets/fonts/Courgette-Regular.ttf"),
   });
 
-  
-
   const [daysUsed, setDaysUsed] = useState(0);
   const [days, setDays] = useState(null);
+  const [backgroundImage, setBackgroundImage] = useState(null);
+  const [user1, setUser1] = useState({ name: "User1", avatar: null });
+  const [user2, setUser2] = useState({ name: "User2", avatar: null });
+  const [editingUser, setEditingUser] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [newAvatar, setNewAvatar] = useState(null);
 
   const formatDate = (date) => {
     const options = { year: "numeric", month: "long", day: "numeric" };
@@ -49,10 +59,70 @@ const HomeScreen = () => {
         console.error("Error initializing date:", error);
       }
     };
-  
+
+    const loadData = async () => {
+      try {
+        const storedBackground = await AsyncStorage.getItem("backgroundImage");
+        const storedUser1 = await AsyncStorage.getItem("user1");
+        const storedUser2 = await AsyncStorage.getItem("user2");
+    
+        if (storedBackground) setBackgroundImage(storedBackground);
+        if (storedUser1) setUser1(JSON.parse(storedUser1));
+        if (storedUser2) setUser2(JSON.parse(storedUser2));
+      } catch (error) {
+        console.error("Error loading data:", error);
+      }
+    };
+    loadData();
     initializeDate();
   }, []);
-  
+
+  const pickBackgroundImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+    });
+    if (!result.canceled) {
+      const uri = result.assets[0].uri; // Lấy URI từ kết quả.
+      setBackgroundImage(uri);
+      await AsyncStorage.setItem("backgroundImage", uri); // Lưu vào AsyncStorage.
+    }
+  };
+
+  const editUser = (user) => {
+    setEditingUser(user);
+    setNewName(user.name);
+    setNewAvatar(user.avatar);
+    setModalVisible(true);
+  };
+
+  const saveUser = async () => {
+    const updatedUser = { name: newName, avatar: newAvatar };
+    try {
+      if (editingUser === user1) {
+        setUser1(updatedUser);
+        await AsyncStorage.setItem("user1", JSON.stringify(updatedUser));
+      } else {
+        setUser2(updatedUser);
+        await AsyncStorage.setItem("user2", JSON.stringify(updatedUser));
+      }
+      setModalVisible(false);
+    } catch (error) {
+      console.error("Error saving user:", error);
+    }
+  };
+
+  const pickAvatar = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+    });
+    if (!result.canceled) {
+      const uri = result.assets[0].uri; // Lấy URI từ kết quả.
+      setNewAvatar(uri);
+    }
+  };
+
   if (!fontsLoaded) {
     return <View style={{ flex: 1, backgroundColor: "#fff" }} />;
   }
@@ -60,19 +130,41 @@ const HomeScreen = () => {
     <SafeAreaView style={{ flex: 1 }}>
       <ImageBackground
         style={styles.container}
-        source={require("../../assets/exampleBG/backgroundLovary.png")}
+        source={
+          backgroundImage
+            ? { uri: backgroundImage }
+            : require("../../assets/exampleBG/sampleBackground-alexander-grey-unsplash.jpg")
+        }
       >
         <View style={styles.screenHeaderContainer}>
           <Text style={styles.screenHeaderText}>Lovary</Text>
           <View style={{ flex: 1 }}></View>
-          <TouchableOpacity>
-            <Ionicons name={"camera"} size={27} color="white" onPress={() => navigation.navigate("Thư viện")}></Ionicons>
+          <TouchableOpacity onPress={pickBackgroundImage}>
+            <Ionicons name="image" size={27} color="white" />
           </TouchableOpacity>
           <TouchableOpacity>
-            <Ionicons name={"book"} size={27} color="white" onPress={() => navigation.navigate("Nhật ký")}></Ionicons>
+            <Ionicons
+              name={"camera"}
+              size={27}
+              color="white"
+              onPress={() => navigation.navigate("Thư viện")}
+            ></Ionicons>
           </TouchableOpacity>
           <TouchableOpacity>
-            <Ionicons name={"calendar"} size={27} color="white" onPress={() => navigation.navigate("Lịch")}></Ionicons>
+            <Ionicons
+              name={"book"}
+              size={27}
+              color="white"
+              onPress={() => navigation.navigate("Nhật ký")}
+            ></Ionicons>
+          </TouchableOpacity>
+          <TouchableOpacity>
+            <Ionicons
+              name={"calendar"}
+              size={27}
+              color="white"
+              onPress={() => navigation.navigate("Lịch")}
+            ></Ionicons>
           </TouchableOpacity>
         </View>
 
@@ -107,13 +199,18 @@ const HomeScreen = () => {
                 alignItems: "center",
                 gap: 5,
               }}
+              onPress={() => editUser(user1)}
               activeOpacity={0.9}
             >
               <Image
                 style={styles.userAvatar}
-                source={require("../../assets/exampleBG/th.jpg")}
+                source={
+                  user1.avatar
+                    ? { uri: user1.avatar }
+                    : require("../../assets/exampleBG/user-avatar-Senapedia.png")
+                }
               ></Image>
-              <Text style={styles.userName}>mintun</Text>
+              <Text style={styles.userName}>{user1.name}</Text>
             </TouchableOpacity>
 
             <Svg width="45" height="65">
@@ -157,17 +254,51 @@ const HomeScreen = () => {
                 alignItems: "center",
                 gap: 5,
               }}
+              onPress={() => editUser(user2)}
               activeOpacity={0.9}
             >
               <Image
                 style={styles.userAvatar}
-                source={require("../../assets/exampleBG/background.jpg")}
+                source={
+                  user2.avatar
+                    ? { uri: user2.avatar }
+                    : require("../../assets/exampleBG/user-avatar-Senapedia.png")
+                }
               ></Image>
-              <Text style={styles.userName}>DTT</Text>
+              <Text style={styles.userName}>{user2.name}</Text>
             </TouchableOpacity>
           </View>
         </View>
       </ImageBackground>
+      <Modal transparent={true} animationType="fade" visible={modalVisible}>
+  <View style={styles.modalContainer}>
+    <View style={styles.modalContent}>
+      <Text style={styles.headerText}>Chỉnh sửa thông tin</Text>
+      <TextInput
+        style={styles.title}
+        value={newName}
+        onChangeText={setNewName}
+        placeholder="Nhập tên mới"
+      />
+      <TouchableOpacity style={styles.avatarButton} onPress={pickAvatar}>
+        <Text style={styles.buttonText}>Đổi ảnh đại diện</Text>
+      </TouchableOpacity>
+
+      <View style={styles.modalButtonContainer}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => setModalVisible(false)}
+        >
+          <Text style={styles.buttonText}>Hủy</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={saveUser}>
+          <Text style={styles.buttonText}>Lưu</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  </View>
+</Modal>
+
     </SafeAreaView>
   );
 };
@@ -244,6 +375,62 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit",
     fontWeight: "700",
     fontSize: 16,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+    padding: 10,
+  },
+  modalContent: {
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 10,
+    width: "80%",
+    alignItems: "center",
+  },
+  headerText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 15,
+  },
+  title: {
+    height: 40,
+    borderColor: "gray",
+    borderWidth: 1,
+    marginBottom: 20,
+    paddingLeft: 10,
+    width: "80%",
+    borderRadius: 5,
+  },
+  avatarButton: {
+    borderColor: "#FF41EC",
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    marginBottom: 20,
+    alignItems: "center",
+  },
+  modalButtonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    paddingHorizontal: 20,
+  },
+  button: {
+    borderColor: "#FF41EC",
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    alignItems: "center",
+  },
+  buttonText: {
+    fontSize: 15,
+    fontWeight: "bold",
+    color: "#FF41EC",
   },
 });
 

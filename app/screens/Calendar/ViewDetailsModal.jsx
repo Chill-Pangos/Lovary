@@ -27,7 +27,7 @@ const ViewDetailsModal = ({ visible, modalType, items, onDelete, onClose }) => {
       }, [items]); */
 
   return (
-    <Modal transparent={true} animationType="slide" visible={visible}>
+    <Modal transparent={true} animationType="fade" visible={visible}>
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
           <Text style={styles.modalHeader}>
