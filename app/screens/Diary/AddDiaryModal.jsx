@@ -7,18 +7,57 @@ import {
   StyleSheet,
   TextInput,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useState } from "react";
+import { Alert } from "react-native";
 
-const AddDiaryModal = ({ visible, setModalVisible }) => {
+const AddDiaryModal = ({ visible, setModalVisible, refreshDiaryList }) => {
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+
+  const handleSave = async () => {
+    if (!title || !content) {
+      Alert.alert("Nhắc nhở", "Bạn chưa nhập đủ các phần");
+      return;
+    }
+    const newDiary = {
+      title,
+      content,
+      date: new Date().toLocaleDateString("vi-VN"), 
+    };
+
+    try {
+      const existingDiaries = await AsyncStorage.getItem("diaries");
+      const diaries = existingDiaries ? JSON.parse(existingDiaries) : [];
+      diaries.unshift(newDiary); 
+      await AsyncStorage.setItem("diaries", JSON.stringify(diaries));
+      refreshDiaryList(); 
+    } catch (error) {
+      console.error("Error saving diary: ", error);
+    }
+
+    setTitle("");
+    setContent("");
+    setModalVisible(false); 
+  };
   return (
     <Modal transparent={true} animationType="slide" visible={visible}>
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
-          <TextInput style={styles.title} placeholder="Tiêu đề"></TextInput>
+          <Text style={styles.headerText}>Thêm nhật ký</Text>
+        <TextInput
+            style={styles.title}
+            placeholder="Tiêu đề"
+            value={title}
+            onChangeText={setTitle}
+          />
           <TextInput
             style={styles.content}
             placeholder="Nội dung"
+            value={content}
+            onChangeText={setContent}
             multiline={true}
-          ></TextInput>
+          />
 
           <View
             style={{
@@ -31,15 +70,13 @@ const AddDiaryModal = ({ visible, setModalVisible }) => {
               style={styles.Button}
               onPress={() => setModalVisible(false)}
             >
-              <Text>Hủy</Text>
+              <Text style={styles.buttonText}>Hủy</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.Button}
-              onPress={() => {
-                setModalVisible(false);
-              }}
+              onPress={handleSave}
             >
-              <Text>Lưu</Text>
+              <Text style={styles.buttonText}>Lưu</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -56,6 +93,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(0,0,0,0.5)",
+    padding: 10,
+    marginBottom:10,
   },
   modalContent: {
     backgroundColor: "white",
@@ -89,7 +128,22 @@ const styles = StyleSheet.create({
     textAlignVertical: "top",
   },
   Button: {
+    borderColor: "#FF41EC",
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingVertical:10,
+    paddingHorizontal:30,
     marginTop: 10,
     alignItems: "center",
   },
+  buttonText: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color:"#FF41EC",
+  },
+  headerText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom:20,
+  }
 });

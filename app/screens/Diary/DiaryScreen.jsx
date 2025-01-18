@@ -12,36 +12,68 @@ import { useFonts } from "expo-font";
 import { FAB } from "react-native-paper";
 import AddDiaryModal from "./AddDiaryModal";
 import SelectTypeModal from "./AddDiaryModal";
-
-const sections = [
-  {
-    date: "17.01.2025",
-    data: [
-      {
-        title: "gasdfawef",
-        content: "T1, doi tuyen toi yeu",
-      },
-    ],
-  },
-  {
-    date: "16.01.2025",
-    data: [
-      {
-        title: "gasdfawef",
-        content:
-          "gọi tên em trong đêm, trái tim này xót xa, người yêu ơi hãy quên những năm tháng êm đềm hôm nào ",
-      },
-    ],
-  },
-];
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useEffect } from "react";
+import DayService from "../../services/DayServices";
 
 const DiaryScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
+  const [diaries, setDiaries] = useState([]);
+  const [firstDate, setFirstDate] = useState(null);
 
   const [fontsLoaded] = useFonts({
     Outfit: require("../../assets/fonts/Outfit-VariableFont_wght.ttf"),
     Courgette: require("../../assets/fonts/Courgette-Regular.ttf"),
   });
+
+  useEffect(() => {
+    loadDiaries();
+    fetchFirstDate();
+  }, []);
+
+  const fetchFirstDate = async () => {
+    const date = await DayService.getFirstDate();
+    if (!date) {
+      await DayService.storeFirstDate();
+      setFirstDate(new Date());
+    } else {
+      setFirstDate(date);
+    }
+  };
+
+  const loadDiaries = async () => {
+    try {
+      const existingDiaries = await AsyncStorage.getItem("diaries");
+      const parsedDiaries = existingDiaries ? JSON.parse(existingDiaries) : [];
+      const groupedDiaries = parsedDiaries.reduce((acc, diary) => {
+        const section = acc.find((s) => s.date === diary.date);
+        if (section) {
+          section.data.push(diary);
+        } else {
+          acc.push({ date: diary.date, data: [diary] });
+        }
+        return acc;
+      }, []);
+      setDiaries(groupedDiaries);
+    } catch (error) {
+      console.error("Error loading diaries: ", error);
+    }
+  };
+
+  const calculateDaysFromFirstDate = (sectionDate) => {
+    if (!firstDate) return "N/A";
+
+    const [day, month, year] = sectionDate.split("/").map(Number);
+    const sectionDateObj = new Date(year, month - 1, day);
+
+    const firstDateObj = new Date(firstDate);
+
+    const daysDifference = Math.floor(
+      (sectionDateObj - firstDateObj) / (1000 * 60 * 60 * 24)
+    );
+
+    return daysDifference >= 0 ? daysDifference : 0;
+  };
 
   if (!fontsLoaded) {
     return null;
@@ -56,8 +88,8 @@ const DiaryScreen = () => {
       </View>
 
       <SectionList
-        style={{ paddingLeft: 10, paddingRight: 10 }}
-        sections={sections}
+        style={{ paddingLeft: 10, paddingRight: 10, }}
+        sections={diaries}
         keyExtractor={(item, index) => item + index}
         renderItem={({ item }) => (
           <View style={styles.itemContainer}>
@@ -85,7 +117,7 @@ const DiaryScreen = () => {
               }}
             >
               {" "}
-              Hẹn hò 6 ngày ..
+              Hẹn hò {calculateDaysFromFirstDate(date)} ngày
             </Text>
           </View>
         )}
@@ -95,7 +127,6 @@ const DiaryScreen = () => {
           flex: 1,
           justifyContent: "flex-end",
           alignItems: "flex-end",
-          padding: 16,
         }}
       >
         <FAB
@@ -108,6 +139,7 @@ const DiaryScreen = () => {
         <AddDiaryModal
           isVisible={modalVisible}
           setModalVisible={setModalVisible}
+          refreshDiaryList={loadDiaries}
         ></AddDiaryModal>
       )}
     </SafeAreaView>
@@ -142,6 +174,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFC3EC",
     borderRadius: 5,
     opacity: 0.7,
+    padding: 10,
+    marginBottom: 10,
   },
   itemTitle: {
     fontFamily: "Outfit",
@@ -170,5 +204,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 3,
     elevation: 5,
+    margin:16,
   },
 });
