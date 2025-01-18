@@ -1,10 +1,4 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  SectionList,
-} from "react-native";
+import { StyleSheet, Text, View, SectionList } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AntDesign } from "@expo/vector-icons";
@@ -88,7 +82,7 @@ const DiaryScreen = () => {
       </View>
 
       <SectionList
-        style={{ paddingLeft: 10, paddingRight: 10, }}
+        style={{ paddingLeft: 10, paddingRight: 10 }}
         sections={diaries}
         keyExtractor={(item, index) => item + index}
         renderItem={({ item }) => (
@@ -204,6 +198,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 3,
     elevation: 5,
-    margin:16,
+    margin: 16,
   },
 });
