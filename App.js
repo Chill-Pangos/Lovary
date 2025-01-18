@@ -1,19 +1,13 @@
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { View, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { colors } from "./app/theme/Colors";
 import HomeScreen from "./app/screens/Home/HomeScreen";
 import CalendarScreen from "./app/screens/Calendar/CalendarScreen";
 import { SafeAreaView } from "react-native-safe-area-context";
 import DiaryScreen from "./app/screens/Diary/DiaryScreen";
-
-const PolaroidScreen = () => (
-  <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-    <Text>Polaroid Screen</Text>
-  </View>
-);
+import AlbumScreen from "./app/screens/Album/AlbumScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -48,7 +42,7 @@ const App = () => {
           })}
         >
           <Tab.Screen name="Trang chủ" component={HomeScreen} />
-          <Tab.Screen name="Thư viện" component={PolaroidScreen} />
+          <Tab.Screen name="Thư viện" component={AlbumScreen} />
           <Tab.Screen name="Nhật ký" component={DiaryScreen} />
           <Tab.Screen name="Lịch" component={CalendarScreen} />
         </Tab.Navigator>
