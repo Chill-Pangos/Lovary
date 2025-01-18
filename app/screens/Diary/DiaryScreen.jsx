@@ -5,10 +5,13 @@ import {
   TouchableOpacity,
   SectionList,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AntDesign } from "@expo/vector-icons";
 import { useFonts } from "expo-font";
+import { FAB } from "react-native-paper";
+import AddDiaryModal from "./AddDiaryModal";
+import SelectTypeModal from "./AddDiaryModal";
 
 const sections = [
   {
@@ -16,7 +19,7 @@ const sections = [
     data: [
       {
         title: "gasdfawef",
-        content: "sdgeasdf",
+        content: "T1, doi tuyen toi yeu",
       },
     ],
   },
@@ -25,13 +28,16 @@ const sections = [
     data: [
       {
         title: "gasdfawef",
-        content: "sdgeasdf",
+        content:
+          "gọi tên em trong đêm, trái tim này xót xa, người yêu ơi hãy quên những năm tháng êm đềm hôm nào ",
       },
     ],
   },
 ];
 
 const DiaryScreen = () => {
+  const [modalVisible, setModalVisible] = useState(false);
+
   const [fontsLoaded] = useFonts({
     Outfit: require("../../assets/fonts/Outfit-VariableFont_wght.ttf"),
     Courgette: require("../../assets/fonts/Courgette-Regular.ttf"),
@@ -46,9 +52,6 @@ const DiaryScreen = () => {
         <View style={styles.screenHeaderContainer}>
           <Text style={styles.screenHeaderText}>Nhật ký</Text>
           <View style={{ flex: 1 }}></View>
-          <TouchableOpacity style={{ marginRight: 5 }}>
-            <AntDesign name="bars" size={30} color="#FF45BB" />
-          </TouchableOpacity>
         </View>
       </View>
 
@@ -60,6 +63,12 @@ const DiaryScreen = () => {
           <View style={styles.itemContainer}>
             <Text style={styles.itemTitle}>{item.title}</Text>
             <Text style={styles.itemContent}>{item.content}</Text>
+            <AntDesign
+              name="heart"
+              size={55}
+              color="#EF17A0"
+              style={styles.itemHeart}
+            />
           </View>
         )}
         renderSectionHeader={({ section: { date } }) => (
@@ -81,6 +90,26 @@ const DiaryScreen = () => {
           </View>
         )}
       />
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "flex-end",
+          alignItems: "flex-end",
+          padding: 16,
+        }}
+      >
+        <FAB
+          style={styles.addButton}
+          icon="plus"
+          onPress={() => setModalVisible(true)}
+        ></FAB>
+      </View>
+      {modalVisible && (
+        <AddDiaryModal
+          isVisible={modalVisible}
+          setModalVisible={setModalVisible}
+        ></AddDiaryModal>
+      )}
     </SafeAreaView>
   );
 };
@@ -98,6 +127,9 @@ const styles = StyleSheet.create({
   screenHeaderText: {
     fontSize: 28,
     fontWeight: "600",
+  },
+  container: {
+    flexDirection: "column",
   },
   itemDate: {
     fontFamily: "Courgette",
@@ -122,5 +154,21 @@ const styles = StyleSheet.create({
     paddingLeft: 40,
     fontSize: 17,
     fontWeight: "500",
+  },
+  itemHeart: {
+    alignSelf: "center",
+  },
+  addButton: {
+    width: 60,
+    height: 60,
+    backgroundColor: "#FEACE4",
+    borderRadius: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5,
   },
 });
