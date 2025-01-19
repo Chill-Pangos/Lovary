@@ -1,33 +1,44 @@
-import React from "react";
-import { useEffect } from "react";
+import { MaterialIcons } from "@expo/vector-icons";
+import React,{useState} from "react";
 import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
+  Image,
   Modal,
   StyleSheet,
-  Image,
-  Alert,
+  Text,
+  TouchableOpacity,
+  View
 } from "react-native";
-import eventOptions from "./eventOptions";
-import { MaterialIcons } from "@expo/vector-icons";
+import { Entypo, AntDesign } from "@expo/vector-icons";
+
 
 const ViewDetailsModal = ({ visible, modalType, items, onDelete, onClose }) => {
-  const renderItems = (item, index) => (
+  const [selectedPhoto, setSelectedPhoto] = useState(null); // Trạng thái ảnh chi tiết
+  const [photoModalVisible, setPhotoModalVisible] = useState(false); // Trạng thái modal chi tiết ảnh
+
+  const openPhotoDetail = (photoUri) => {
+    setSelectedPhoto(photoUri);
+    setPhotoModalVisible(true);
+  };
+
+  const closePhotoDetail = () => {
+    setSelectedPhoto(null);
+    setPhotoModalVisible(false);
+  };
+ /*  const renderItems = (item, index) => (
     <View style={styles.listItem}>
       <Text>{item}</Text>
       <TouchableOpacity onPress={() => onDelete(index)}>
         <Text style={{ color: "red" }}>Xóa</Text>
       </TouchableOpacity>
     </View>
-  );
+  ); */
   /*   useEffect(() => {
         alert(`Items: ${JSON.stringify(items)}`);
       }, [items]); */
 
   return (
-    <Modal transparent={true} animationType="fade" visible={visible}>
+    <>
+      <Modal transparent={true} animationType="fade" visible={visible}>
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
           <Text style={styles.modalHeader}>
@@ -38,38 +49,31 @@ const ViewDetailsModal = ({ visible, modalType, items, onDelete, onClose }) => {
               : "Ghi chú"}
           </Text>
           {modalType === "photos"
-            ? items.map((photoUri, index) => (
+              ? (<View style={styles.gridContainer}>
+                {items.map((photoUri, index) => (
                 <View
                   key={index}
-                  style={{
-                    marginBottom: 10,
-                    flexDirection: "row",
-                    justifyContent: "space-evenly",
-                    alignItems: "center",
-                  }}
+                  style={styles.gridItem}
                 >
                   {photoUri && (
+                    <TouchableOpacity onPress={() => openPhotoDetail(photoUri)}>
                     <Image
                       source={{ uri: photoUri }}
-                      style={{ width: 100, height: 100, borderRadius: 10 }}
+                      style={styles.image}
+                      resizeMode="cover"
                     />
+                  </TouchableOpacity>
+
                   )}
-                  <TouchableOpacity onPress={() => onDelete(index)}>
-                    <Text
-                      style={{
-                        color: "red",
-                        borderColor: "red",
-                        paddingHorizontal: 8,
-                        paddingVertical: 4,
-                        borderWidth: 1,
-                        borderRadius: 8,
-                      }}
-                    >
-                      X
-                    </Text>
+                  <TouchableOpacity
+                    style={styles.deleteButton}
+                    onPress={() => onDelete(index)}
+                  >
+                    <AntDesign name="close" size={16} color="#fff" />
                   </TouchableOpacity>
                 </View>
-              ))
+              ))}
+            </View>)
             : modalType === "notes"
             ? items.map((item, index) => (
                 <View
@@ -135,6 +139,24 @@ const ViewDetailsModal = ({ visible, modalType, items, onDelete, onClose }) => {
         </View>
       </View>
     </Modal>
+      
+       {/* Modal xem chi tiết ảnh */}
+       <Modal transparent={true} animationType="fade" visible={photoModalVisible}>
+        <View style={styles.photoModalContainer}>
+          <TouchableOpacity style={styles.photoModalClose} onPress={closePhotoDetail}>
+          <AntDesign name="close" size={28} color="#fff" />
+          </TouchableOpacity>
+          {selectedPhoto && (
+            <Image
+              source={{ uri: selectedPhoto }}
+              style={{ width: "90%", height: "70%", borderRadius: 10 }}
+              resizeMode="contain"
+            />
+          )}
+        </View>
+      </Modal>
+    </>
+    
   );
 };
 
@@ -177,5 +199,42 @@ const styles = StyleSheet.create({
   eventName: {
     marginLeft: 10,
     fontSize: 16,
+  },
+  photoModalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.8)",
+  },
+  photoModalClose: {
+    position: "absolute",
+    top: 40,
+    right: 20,
+    zIndex: 1,
+  },
+  gridContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    gap: 10,
+  },
+  gridItem: {
+    position: "relative",
+    width: "30%",
+    aspectRatio: 1, // Tỷ lệ 1:1
+    marginBottom: 10,
+  },
+  image: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 10,
+  },
+  deleteButton: {
+    position: "absolute",
+    top: 5,
+    right: 5,
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    borderRadius: 12,
+    padding: 4,
   },
 });

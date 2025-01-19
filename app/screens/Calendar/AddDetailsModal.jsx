@@ -1,17 +1,16 @@
+import { MaterialIcons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
 import React, { useState } from "react";
 import {
-  View,
+  FlatList,
+  Image,
+  Modal,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  Modal,
-  StyleSheet,
-  Image,
-  FlatList,
+  View
 } from "react-native";
-import * as ImagePicker from "expo-image-picker";
-import { MaterialIcons } from "@expo/vector-icons";
-import { useEffect } from "react";
 
 import eventOptions from "./eventOptions";
 
@@ -144,7 +143,7 @@ const AddDetailModal = ({
               placeholder={`Nhập ghi chú
               `}
               value={inputValue}
-              onChangeText={onChangeText}
+                  onChangeText={onChangeText}
             />
           )}
           <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
@@ -181,10 +180,11 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: "#B0F3C4",
     borderRadius: 5,
     padding: 10,
     marginVertical: 10,
+    backgroundColor:"#B0F3C460"
   },
   saveButton: {
     backgroundColor: "#FF69B4",
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   imagePickerButton: {
-    backgroundColor: "#FF69C9",
+    backgroundColor: "#C9C3FF",
     padding: 10,
     borderRadius: 5,
     alignItems: "center",
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   selectedEvent: {
-    borderColor: "#FF69B4",
+    borderColor: "#FFC1E1",
   },
   eventText: {
     marginLeft: 10,
