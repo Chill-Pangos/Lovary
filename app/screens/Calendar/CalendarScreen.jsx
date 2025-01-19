@@ -4,6 +4,7 @@ import {
   TouchableOpacity,
   View,
   Dimensions,
+  Alert,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Calendar } from "react-native-calendars";
@@ -104,15 +105,18 @@ const CalendarScreen = () => {
       newData[selectedDate].photos.push(imageUri);
     } else if (inputValue) {
       newData[selectedDate].notes.push(inputValue);
-    } else {
+    } else if(eventChoosen) {
       newData[selectedDate].events.push(eventChoosen);
+    } else {
+      Alert.alert("Nhắc nhở", "Vui lòng nhập đầy đủ nội dung");
+      return;
     }
     /*  alert("imageUri before saving:", imageUri);
     alert("newData before saving:", newData); */
     await saveData(newData);
     setInputValue("");
     setImageUri(null);
-    setEventChoosen("");
+    setEventChoosen(null);
     setCurrentModal(null);
   };
 
@@ -137,11 +141,11 @@ const CalendarScreen = () => {
             style={{ marginRight: 15 }}
             onPress={() => setCurrentModal("selectType")}
           >
-            <Entypo name="plus" size={30} color="#FF45BB" />
+            <Entypo name="plus" size={35} color="#FF45BB" />
           </TouchableOpacity>
-          <TouchableOpacity>
+          {/* <TouchableOpacity>
             <FontAwesome6 name="bars" size={24} color="#FF45BB" />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
 
         <Calendar
