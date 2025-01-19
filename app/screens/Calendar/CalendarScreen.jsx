@@ -40,7 +40,17 @@ const renderCustomHeader = (date) => {
 
 const formatDate = (dateString) => {
   const [year, month, day] = dateString.split("-");
-  return `${day}/${month}/${year}`;
+  return `${day.padStart(2, "0")}/${month.padStart(2, "0")}/${year}`;
+};
+
+const reverseFormatDate = (dateString) => {
+  const [day, month, year] = dateString.split("/");
+  return `${year}-${month}-${day}`;
+};
+
+const formatDateFromLocalString = (dateString) => {
+  const [day, month, year] = dateString.split("/");
+  return `${day.padStart(2, "0")}/${month.padStart(2, "0")}/${year}`;
 };
 
 const CalendarScreen = () => {
@@ -54,11 +64,13 @@ const CalendarScreen = () => {
     (now.getMonth() + 1).toString().padStart(2, "0") +
     "-" +
     now.getDate().toString().padStart(2, "0");
+    
 
   const [selectedDate, setSelectedDate] = useState(today); */
   const [selectedDate, setSelectedDate] = useState(
-    new Date().toISOString().split("T")[0]
+    formatDateFromLocalString(new Date().toLocaleString("vi-vn").split(" ")[1])
   );
+
   const [data, setData] = useState({});
   const [modalType, setModalType] = useState(null);
   const [currentModal, setCurrentModal] = useState(null); // 'add' | 'view' | 'selectType'
@@ -95,7 +107,7 @@ const CalendarScreen = () => {
     } else {
       newData[selectedDate].events.push(eventChoosen);
     }
-   /*  alert("imageUri before saving:", imageUri);
+    /*  alert("imageUri before saving:", imageUri);
     alert("newData before saving:", newData); */
     await saveData(newData);
     setInputValue("");
@@ -134,10 +146,10 @@ const CalendarScreen = () => {
 
         <Calendar
           onDayPress={(day) => {
-            setSelectedDate(day.dateString);
+            setSelectedDate(formatDate(day.dateString));
           }}
           markedDates={{
-            [selectedDate]: {
+            [reverseFormatDate(selectedDate)]: {
               selected: true,
               marked: true,
               selectedColor: "#FF69B4",
@@ -172,7 +184,7 @@ const CalendarScreen = () => {
             <Text style={styles.quoteTextHeader}>
               Hãy cùng nhau tạo nên ngày đặc biệt
             </Text>
-            <Text style={styles.quoteTextDay}>{formatDate(selectedDate)}</Text>
+            <Text style={styles.quoteTextDay}>{selectedDate}</Text>
           </View>
           <Feather name="chevron-right" size={35} color="#FF45BB"></Feather>
         </TouchableOpacity>
