@@ -10,7 +10,9 @@ import {
   Modal,
   TextInput,
   Button,
+  Platform,
 } from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -30,6 +32,8 @@ const HomeScreen = () => {
 
   const [daysUsed, setDaysUsed] = useState(0);
   const [days, setDays] = useState(null);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [backgroundImage, setBackgroundImage] = useState(null);
   const [user1, setUser1] = useState({ name: "User1", avatar: null });
   const [user2, setUser2] = useState({ name: "User2", avatar: null });
@@ -73,9 +77,30 @@ const HomeScreen = () => {
         console.error("Error loading data:", error);
       }
     };
+    /* const resetAsyncStorage = async () => {
+      try {
+        await AsyncStorage.clear();
+        console.log('AsyncStorage has been cleared.');
+      } catch (error) {
+        console.error('Failed to clear AsyncStorage:', error);
+      }
+    };
+    resetAsyncStorage(); */
     loadData();
     initializeDate();
   }, []);
+
+  const handleDateChange = async (event, selectedDate) => {
+    setShowDatePicker(false); 
+    if (event.type === "set") {
+      const newDate = selectedDate || new Date();
+      setSelectedDate(newDate); 
+      await AsyncStorage.setItem("firstDate", newDate.toISOString()); 
+      const days = DayService.calculateDays(newDate);
+      setDaysUsed(days); 
+      setDays(newDate); 
+    }
+  };
 
   const pickBackgroundImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -167,7 +192,7 @@ const HomeScreen = () => {
             ></Ionicons>
           </TouchableOpacity>
         </View>
-
+        <TouchableOpacity onPress={() => setShowDatePicker(true)}>
         <View style={styles.heartContainer}>
           <Svg width="200" height="180">
             <Path
@@ -188,7 +213,7 @@ const HomeScreen = () => {
             <Text style={styles.heartCountText}>Ngày</Text>
           </View>
         </View>
-
+        </TouchableOpacity>
         <View style={styles.userContainer}>
           <View style={styles.userContainerOpacity}></View>
           <View style={styles.userContainerWithAvatar}>
@@ -298,7 +323,15 @@ const HomeScreen = () => {
     </View>
   </View>
 </Modal>
-
+{showDatePicker && (
+          <DateTimePicker
+            value={selectedDate}
+            mode="date"
+            display={Platform.OS === "ios" ? "spinner" : "default"}
+            onChange={handleDateChange}
+            maximumDate={new Date()} 
+          />
+        )}
     </SafeAreaView>
   );
 };

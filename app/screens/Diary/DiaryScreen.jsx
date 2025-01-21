@@ -60,13 +60,11 @@ const DiaryScreen = () => {
     const [day, month, year] = sectionDate.split("/").map(Number);
     const sectionDateObj = new Date(year, month - 1, day);
 
-    const firstDateObj = new Date(firstDate);
-
     const daysDifference = Math.floor(
-      (sectionDateObj - firstDateObj) / (1000 * 60 * 60 * 24)
+      (sectionDateObj - firstDate) / (1000 * 60 * 60 * 24)
     );
 
-    return daysDifference >= 0 ? daysDifference : 0;
+    return daysDifference >= 0 ? daysDifference + 1 : 0;
   };
 
   if (!fontsLoaded) {
@@ -80,7 +78,37 @@ const DiaryScreen = () => {
           <View style={{ flex: 1 }}></View>
         </View>
       </View>
-
+{!diaries[0] && (<View
+            styles={{
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Text
+              style={{
+                margin: 16,
+                fontStyle: "italic",
+                fontSize: 18,
+                textAlign: "center",
+                color: "#FF45BB",
+              }}
+            >
+              Hiện tại chưa có nhật ký nào
+            </Text>
+            <Text
+              style={{
+                margin: 16,
+                fontStyle: "italic",
+                fontSize: 14,
+                textAlign: "center",
+                color: "#FF45BB",
+              }}
+            >
+              Hãy viết lại những tháng ngày bên nhau {"\n"}bằng cách nhấn vào nút "
+              + "
+            </Text>
+          </View>)}
       <SectionList
         style={{ paddingLeft: 10, paddingRight: 10 }}
         sections={diaries}
