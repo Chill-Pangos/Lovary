@@ -94,7 +94,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "rgba(0,0,0,0.5)",
     padding: 10,
-    marginBottom:10,
   },
   modalContent: {
     backgroundColor: "white",
